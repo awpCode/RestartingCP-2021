@@ -63,18 +63,17 @@ int32_t main()
     vector<pii >ws;
     rep(i,n){
       hs.pb({h[i],{w[i],i}});
-      ws.pb({w[i],{h[i],i}});
     }
     sort(hs.begin(),hs.end());
-    sort(ws.begin(),ws.end());
-    int prefhs[n];
-    int prefws[n];
-    prefhs[0] = hs[0].ss.ff;
-    prefws[0] = ws[0].ss.ff;
+    pi prefhs[n];
+    prefhs[0] = {hs[0].ss.ff,hs[0].ss.ss};
     repre(i,1,n-1)
     {
-      prefhs[i] = min(prefhs[i-1],hs[i].ss.ff);
-      prefws[i] = min(prefws[i-1],ws[i].ss.ff);
+      if(hs[i].ss.ff < prefhs[i-1].ff)
+      {
+        prefhs[i] = {hs[i].ss.ff,hs[i].ss.ss};
+      }
+      else prefhs[i] = prefhs[i-1];
     }
     int ans[n];
     clr1(ans);
@@ -86,11 +85,38 @@ int32_t main()
       while(low <= high)
       {
         int mid = (low+high)/2;
-        if(ele <= ws[mid].ff)
+        if(ele <= hs[mid].ff)
           high = mid - 1;
         else low = mid + 1;
       }
+      low--;
+      if(low<0 || prefhs[low].ff >= w[i])
+      {
+          low = 0;
+          high = n-1;
+          ele = w[i];
+          while(low <= high)
+          {
+            int mid = (low+high)/2;
+            if(ele <= hs[mid].ff)
+              high = mid - 1;
+            else low = mid + 1;
+          }
+          low--;
+          if(low<0)continue;
+          else //alternate orientation
+          {
+            if(prefhs[low].ss!=i && prefhs[low].ff < h[i])
+              ans[i] = prefhs[low].ss + 1;
+          }
+      }
+      else if(low>=0 && prefhs[low].ff < w[i]) //same orientation
+      {
+        ans[i] = prefhs[low].ss + 1;
+      }
     }
+    rep(i,n)cout<<ans[i]<<" ";
+    cout<<'\n';
   }
 
   return 0;
